@@ -22,3 +22,19 @@ This document records technical and design decisions made during the development
     4. Fall back to file extension.
     5. Default to `USER_MESSAGE` or `TEXT` if plain text.
 - **Status:** Approved.
+
+### DEC-003: DOCX XML Parsing and Zip Bomb Security (Phase 1)
+- **Context:** DOCX files can carry hidden text via `<w:vanish/>`, white font color (`<w:color w:val="FFFFFF"/>`), tiny font sizes, or in comments (`word/comments.xml`). High-level docx libraries often ignore or strip vanished runs. Furthermore, malicious archives can pose zip-bomb denial of service.
+- **Decision:**
+  1. Inspect the zip archive directly: sum `ZipInfo.file_size` before decompression and raise `ZipBombError` if total uncompressed size exceeds policy `max_zip_uncompressed_bytes`.
+  2. Parse `word/document.xml`, `word/comments.xml`, `word/footer*.xml`, and `docProps/core.xml` via `lxml.etree` to reliably identify run-level formatting (`<w:vanish/>`, `<w:color>`, `<w:sz>`) and map them to `origin="hidden"` or `origin="comment"` with exact reason codes.
+- **Status:** Approved.
+
+### DEC-004: Fixture Factory Architecture (Phase 1)
+- **Context:** Section 9.1 requires reproducible generation of fixtures across 10 carriers and all specified hiding techniques.
+- **Decision:**
+  - Implemented `eval/fixture_factory.py` with `make(payload: str, carrier: str, technique: str) -> bytes | str`.
+  - Used `pymupdf` to generate real PDF files with exact coordinates and font/color properties.
+  - Used `PIL.Image` and `PIL.ImageDraw` for image synthesis with EXIF metadata chunks.
+  - Used in-memory `zipfile` for bit-exact WordprocessingML package creation.
+- **Status:** Approved.
