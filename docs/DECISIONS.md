@@ -57,3 +57,12 @@ This document records technical and design decisions made during the development
   4. **Multi-Turn Session Tracking:** Persisted turn history with SQLite backing and implemented a cross-turn fragmentation check that concatenates turns $t-3 \dots t$ and reruns rules to detect fragmented attack delivery.
   5. **Unified API Route Handling:** Utilized `fastapi.Request` inspection in `/api/inspect` and `/api/neutralize` to seamlessly process both JSON payloads and multipart file uploads without schema parsing conflicts.
 - **Status:** Approved.
+
+### DEC-007: Evaluation Harness, Deterministic Fixture Builds, and Pre-Registered Claims (Phase 4)
+- **Context:** Section 9 specifies benchmark composition (dev + held-out test split), freeze protocol via SHA-256 (`data/test.frozen.sha256`), calculation of binary, per-category, per-source, and latency percentiles, and automated generation of `docs/CLAIMS.md`.
+- **Decision:**
+  1. **Conversational Multi-Turn Carrier Routing:** Multi-turn jailbreak items in `eval/build_dataset.py` are explicitly assigned carrier `user_message` and source `InputSource.USER_MESSAGE`, reflecting interactive user conversations.
+  2. **Valid Benign Binary Fixtures:** Benign carrier files for binary formats (`pdf`, `docx`, `image`) are generated via `fixture_factory.make()` with visible paragraph/text techniques, ensuring structurally valid files that test real ingestion adapters without spurious format errors.
+  3. **Strict Test Freeze Enforcement:** `verify_test_freeze()` checks the SHA-256 of `data/test.jsonl` against `data/test.frozen.sha256`. If mismatched, `eval/run_eval.py --split test` immediately halts with an error, preventing test-split data leakage or post-hoc tampering.
+  4. **Automated Claims Reporting:** `eval/claims.py` consumes `reports/report.json` and writes `docs/CLAIMS.md` purely from measured numbers, fulfilling Section 0 Rule 4.
+- **Status:** Approved.

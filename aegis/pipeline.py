@@ -169,7 +169,9 @@ class FirewallPipeline:
             envelope_text = None
 
         timings["l5_neutralize_ms"] = round((time.perf_counter() - t_l5) * 1000, 2)
-        timings["total_pipeline_ms"] = round((time.perf_counter() - t_start) * 1000, 2)
+        total_time = round((time.perf_counter() - t_start) * 1000, 2)
+        timings["total_pipeline_ms"] = total_time
+        timings["total_ms"] = total_time
 
         return Verdict(
             request_id=request_id,
