@@ -47,3 +47,13 @@ This document records technical and design decisions made during the development
   3. Included zero-width spaces (`ZERO_WIDTH_CODEPOINTS`) and Unicode tag codepoints in the printable UTF-8 calculation for decoded binary/base64/hex payloads to seamlessly support chained multi-layer evasions (e.g. Base64 containing zero-width spaces).
   4. Enforced BFS variant generation capped at 12 unique variants and 3 recursion steps, deduplicating text strings to maximize detector diversity.
 - **Status:** Approved.
+
+### DEC-006: Rule Cascade, Policy Decisions, and Spotlighting Neutralizer (Phase 3)
+- **Context:** Section 5.3 through 5.5 requires implementing 9 attack rule families, an instruction-in-data detector, cross-turn session tracking, noisy-OR risk fusion, and spotlighting envelope neutralization.
+- **Decision:**
+  1. **ReDoS-Safe Regex Design:** Bounded all wildcards with explicit limits (e.g. `{0,60}?`) and word boundaries. Avoided unbounded nested quantifiers to ensure sub-millisecond execution even on large texts.
+  2. **Hard-Negative Separation in Indirect Injection:** Configured `InstructionInDataDetector` to require imperative verbs to strictly co-occur with an AI cue, a tool/exfiltration target object, or a hidden segment origin. This explicitly prevents false positives on benign business requests (e.g. "Please send me the report").
+  3. **Nonce Envelope Hardening:** Neutralized all delimiter lookalikes (`<<<`, `>>>`, `UNTRUSTED_DATA`) within inbound content before envelope packaging, ensuring attackers cannot break out of spotlighting boundaries.
+  4. **Multi-Turn Session Tracking:** Persisted turn history with SQLite backing and implemented a cross-turn fragmentation check that concatenates turns $t-3 \dots t$ and reruns rules to detect fragmented attack delivery.
+  5. **Unified API Route Handling:** Utilized `fastapi.Request` inspection in `/api/inspect` and `/api/neutralize` to seamlessly process both JSON payloads and multipart file uploads without schema parsing conflicts.
+- **Status:** Approved.

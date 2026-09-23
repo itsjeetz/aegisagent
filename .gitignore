@@ -42,6 +42,9 @@ wheels/
 !/data/fixtures/.gitkeep
 /reports/*
 !/reports/.gitkeep
+*.sqlite
+*.sqlite3
+*.db
 
 # OS
 .DS_Store
