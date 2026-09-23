@@ -95,3 +95,17 @@ This document records technical and design decisions made during the development
   5. **Adversarial Red-Team Generator (§8.2):** `eval/redteam.py` generates adversarial mutations (polite indirect framing, roleplay hijacking, syntax concealment) across attack categories, submitting them against the firewall and appending bypasses (`action == "ALLOW"`) to `data/redteam_bypasses.jsonl`.
 - **Status:** Approved.
 
+### DEC-011: SOC Dashboard UI and Single-Page Architecture (Phase 8)
+- **Context:** Section 11 and 12 require a responsive, dark SOC-style single-page dashboard covering 5 tabs, clearly labeling mock/offline capabilities, showing degraded dependencies honestly, and interacting strictly with real API endpoints.
+- **Decision:**
+  1. **Vanilla HTML/CSS/JS Single-Page Application (§11):** Built without external build steps or heavy node frameworks. Uses modern semantic HTML5, CSS custom properties (dark obsidian cyber theme, Inter typography, Fira Code monospace, and glassmorphic cards), and modular vanilla JS.
+  2. **Comprehensive 5-Tab Capabilities:**
+     - **Tab 1 (Inspector & Neutralizer):** Supports 10 attack/benign presets, format auto-detection across all 11 sources, drag-and-drop multipart upload, three-pane view (raw highlighted text, normalized variants, sanitized nonce envelope), and per-category score meters.
+     - **Tab 2 (Agent Sandbox):** Executes scenarios S1-S9 and B1-B3 side-by-side (unprotected vs protected), rendering a ReAct tool timeline, canary exfiltration alerts, and ASR outcome badges.
+     - **Tab 3 (Evaluation & Claims):** Renders the latest empirical benchmark report, pre-registered claim criteria verification checklist (F3, D2, D3), category/source tables, and cascade ablation lift.
+     - **Tab 4 (Audit & Feedback):** Displays structured audit logs with filters, feedback submission form, review queue approval/rejection controls, and model retraining trigger.
+     - **Tab 5 (Policy Configuration):** Configures live thresholds, source multipliers, and tool tiers, hot-reloading configurations via `PUT /api/policy`.
+  3. **Honest Capability Badges (§0 Rule 2):** Top navigation status bar reflects live capabilities from `GET /api/health`, clearly labeling the victim agent as `MOCK (offline)` and marking missing host binaries (such as Tesseract OCR) as offline rather than concealing degradation.
+- **Status:** Approved.
+
+

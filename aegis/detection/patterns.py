@@ -24,7 +24,7 @@ OVERRIDE_PATTERNS: list[RulePattern] = [
         regex=re.compile(
             r"\b(?:ignore|disregard|forget|override|bypass|discard|cancel)\s+"
             r"(?:all\s+)?(?:previous|prior|above|earlier|all|original|current)\s+"
-            r"(?:instructions|rules|prompt|guidelines|context|constraints|system\s+message)\b",
+            r"(?:instructions|rules|directions?|prompt|guidelines|context|constraints|system\s+message)\b",
             re.IGNORECASE,
         ),
         weight=0.95,
