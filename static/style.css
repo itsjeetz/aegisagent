@@ -1327,3 +1327,116 @@ mark.attack-span {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ========================================================================= */
+/* PUBLIC DEMO MODE BANNER & CONTROLS                                       */
+/* ========================================================================= */
+
+.demo-mode-banner {
+  background: linear-gradient(90deg, rgba(235, 160, 48, 0.12) 0%, rgba(56, 139, 253, 0.12) 100%);
+  border-bottom: 1px solid rgba(235, 160, 48, 0.35);
+  padding: 8px 24px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.demo-banner-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12.5px;
+  color: var(--text-primary);
+  flex-wrap: wrap;
+}
+
+.demo-badge {
+  background: rgba(235, 160, 48, 0.2);
+  color: #f0883e;
+  border: 1px solid rgba(235, 160, 48, 0.4);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.demo-item {
+  font-weight: 500;
+}
+
+.demo-dot {
+  color: var(--text-muted);
+}
+
+.demo-sub {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.eval-btn-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.eval-markdown-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.eval-markdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-secondary);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.eval-markdown-header h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-bright);
+}
+
+.btn-close-md {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.btn-close-md:hover {
+  color: var(--text-bright);
+}
+
+.eval-markdown-body {
+  padding: 16px;
+  max-height: 480px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.btn-disabled-demo {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+}
+

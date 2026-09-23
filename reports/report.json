@@ -1,0 +1,926 @@
+{
+  "metadata": {
+    "split": "test",
+    "mode": "cascade",
+    "timestamp": "2026-09-23T21:07:15.181116+00:00",
+    "test_hash_info": {
+      "matches": true,
+      "computed": "c9721c9e17077e1b70a3ff55a5e3b084e080773a54d45c00e08afe5acd02ed0d",
+      "recorded": "c9721c9e17077e1b70a3ff55a5e3b084e080773a54d45c00e08afe5acd02ed0d"
+    }
+  },
+  "metrics": {
+    "binary": {
+      "total_items": 196,
+      "total_attacks": 144,
+      "total_benign": 52,
+      "tp": 94,
+      "fn": 50,
+      "fp": 1,
+      "tn": 51,
+      "precision": 0.9895,
+      "recall": 0.6528,
+      "f1": 0.7866,
+      "fpr": 0.0192,
+      "accuracy": 0.7398
+    },
+    "categories": {
+      "INSTRUCTION_OVERRIDE": {
+        "count": 16,
+        "flagged_recall": 0.875,
+        "category_correct_recall": 0.75
+      },
+      "ROLE_CHANGE": {
+        "count": 16,
+        "flagged_recall": 0.6875,
+        "category_correct_recall": 0.5625
+      },
+      "SECRET_EXTRACTION": {
+        "count": 16,
+        "flagged_recall": 0.5,
+        "category_correct_recall": 0.3125
+      },
+      "TOOL_ABUSE": {
+        "count": 16,
+        "flagged_recall": 0.75,
+        "category_correct_recall": 0.625
+      },
+      "CREDENTIAL_THEFT": {
+        "count": 16,
+        "flagged_recall": 0.5,
+        "category_correct_recall": 0.25
+      },
+      "CONTEXT_POISONING": {
+        "count": 16,
+        "flagged_recall": 0.5625,
+        "category_correct_recall": 0.25
+      },
+      "MULTI_STEP_JAILBREAK": {
+        "count": 16,
+        "flagged_recall": 0.5625,
+        "category_correct_recall": 0.5625
+      },
+      "ENCODED_INSTRUCTIONS": {
+        "count": 16,
+        "flagged_recall": 0.75,
+        "category_correct_recall": 0.625
+      },
+      "INDIRECT_PROMPT_INJECTION": {
+        "count": 117,
+        "flagged_recall": 0.6752,
+        "category_correct_recall": 0.9915
+      }
+    },
+    "sources": {
+      "user_message": {
+        "count": 39,
+        "attack_count": 28,
+        "benign_count": 11,
+        "tp": 15,
+        "fp": 0,
+        "recall": 0.5357,
+        "fpr": 0.0
+      },
+      "web_page": {
+        "count": 14,
+        "attack_count": 12,
+        "benign_count": 2,
+        "tp": 6,
+        "fp": 0,
+        "recall": 0.5,
+        "fpr": 0.0
+      },
+      "pdf": {
+        "count": 18,
+        "attack_count": 12,
+        "benign_count": 6,
+        "tp": 6,
+        "fp": 0,
+        "recall": 0.5,
+        "fpr": 0.0
+      },
+      "email": {
+        "count": 18,
+        "attack_count": 12,
+        "benign_count": 6,
+        "tp": 12,
+        "fp": 0,
+        "recall": 1.0,
+        "fpr": 0.0
+      },
+      "markdown": {
+        "count": 16,
+        "attack_count": 12,
+        "benign_count": 4,
+        "tp": 12,
+        "fp": 0,
+        "recall": 1.0,
+        "fpr": 0.0
+      },
+      "html": {
+        "count": 17,
+        "attack_count": 12,
+        "benign_count": 5,
+        "tp": 6,
+        "fp": 0,
+        "recall": 0.5,
+        "fpr": 0.0
+      },
+      "docx": {
+        "count": 17,
+        "attack_count": 12,
+        "benign_count": 5,
+        "tp": 11,
+        "fp": 0,
+        "recall": 0.9167,
+        "fpr": 0.0
+      },
+      "api_response": {
+        "count": 15,
+        "attack_count": 11,
+        "benign_count": 4,
+        "tp": 7,
+        "fp": 0,
+        "recall": 0.6364,
+        "fpr": 0.0
+      },
+      "ocr_text": {
+        "count": 13,
+        "attack_count": 11,
+        "benign_count": 2,
+        "tp": 9,
+        "fp": 0,
+        "recall": 0.8182,
+        "fpr": 0.0
+      },
+      "source_code": {
+        "count": 16,
+        "attack_count": 11,
+        "benign_count": 5,
+        "tp": 10,
+        "fp": 1,
+        "recall": 0.9091,
+        "fpr": 0.2
+      },
+      "image": {
+        "count": 13,
+        "attack_count": 11,
+        "benign_count": 2,
+        "tp": 0,
+        "fp": 0,
+        "recall": 0.0,
+        "fpr": 0.0
+      }
+    },
+    "heatmap": {
+      "INSTRUCTION_OVERRIDE": {
+        "direct": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "comment": {
+          "count": 2,
+          "flagged": 1,
+          "recall": 0.5
+        },
+        "offscreen": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "metadata": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "visible": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "header_field": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "image_alt": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "key_name": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "string_literal": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "confusable_chars": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "small_text": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "rot13": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "hidden_div": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "annotation": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "white_text": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        }
+      },
+      "INDIRECT_PROMPT_INJECTION": {
+        "comment": {
+          "count": 15,
+          "flagged": 12,
+          "recall": 0.8
+        },
+        "offscreen": {
+          "count": 6,
+          "flagged": 4,
+          "recall": 0.6667
+        },
+        "metadata": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "visible": {
+          "count": 3,
+          "flagged": 2,
+          "recall": 0.6667
+        },
+        "header_field": {
+          "count": 2,
+          "flagged": 2,
+          "recall": 1.0
+        },
+        "image_alt": {
+          "count": 3,
+          "flagged": 3,
+          "recall": 1.0
+        },
+        "key_name": {
+          "count": 4,
+          "flagged": 3,
+          "recall": 0.75
+        },
+        "string_literal": {
+          "count": 4,
+          "flagged": 3,
+          "recall": 0.75
+        },
+        "confusable_chars": {
+          "count": 6,
+          "flagged": 5,
+          "recall": 0.8333
+        },
+        "small_text": {
+          "count": 3,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "hidden_div": {
+          "count": 4,
+          "flagged": 3,
+          "recall": 0.75
+        },
+        "annotation": {
+          "count": 3,
+          "flagged": 1,
+          "recall": 0.3333
+        },
+        "white_text": {
+          "count": 6,
+          "flagged": 5,
+          "recall": 0.8333
+        },
+        "link_title": {
+          "count": 3,
+          "flagged": 3,
+          "recall": 1.0
+        },
+        "metadata_field": {
+          "count": 4,
+          "flagged": 3,
+          "recall": 0.75
+        },
+        "noisy_visible": {
+          "count": 5,
+          "flagged": 4,
+          "recall": 0.8
+        },
+        "faint_text": {
+          "count": 3,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "tiny_font": {
+          "count": 6,
+          "flagged": 3,
+          "recall": 0.5
+        },
+        "body_visible": {
+          "count": 3,
+          "flagged": 3,
+          "recall": 1.0
+        },
+        "visible_text": {
+          "count": 3,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "hidden_run": {
+          "count": 3,
+          "flagged": 3,
+          "recall": 1.0
+        },
+        "inline_html": {
+          "count": 3,
+          "flagged": 3,
+          "recall": 1.0
+        },
+        "exif_comment": {
+          "count": 2,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "visible_paragraph": {
+          "count": 4,
+          "flagged": 2,
+          "recall": 0.5
+        },
+        "nested_value": {
+          "count": 3,
+          "flagged": 1,
+          "recall": 0.3333
+        },
+        "docstring": {
+          "count": 2,
+          "flagged": 2,
+          "recall": 1.0
+        },
+        "quoted_thread": {
+          "count": 3,
+          "flagged": 3,
+          "recall": 1.0
+        },
+        "meta_tag": {
+          "count": 2,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "html_hidden": {
+          "count": 3,
+          "flagged": 3,
+          "recall": 1.0
+        },
+        "alt_text": {
+          "count": 2,
+          "flagged": 1,
+          "recall": 0.5
+        },
+        "base64": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "tiny_text": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "attachment": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        }
+      },
+      "ROLE_CHANGE": {
+        "header_field": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "link_title": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "metadata_field": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "comment": {
+          "count": 3,
+          "flagged": 3,
+          "recall": 1.0
+        },
+        "noisy_visible": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "faint_text": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "homoglyph": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "tiny_font": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "offscreen": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "annotation": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "body_visible": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "key_name": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "string_literal": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "confusable_chars": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        }
+      },
+      "SECRET_EXTRACTION": {
+        "visible_text": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "base64": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "offscreen": {
+          "count": 2,
+          "flagged": 1,
+          "recall": 0.5
+        },
+        "tiny_font": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "annotation": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "hidden_run": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "body_visible": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "inline_html": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "metadata_field": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "comment": {
+          "count": 2,
+          "flagged": 1,
+          "recall": 0.5
+        },
+        "noisy_visible": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "exif_comment": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "leet": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "visible_paragraph": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        }
+      },
+      "TOOL_ABUSE": {
+        "visible": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "body_visible": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "image_alt": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "nested_value": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "docstring": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "confusable_chars": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "small_text": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "zero_width": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "hidden_div": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "tiny_font": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "visible_paragraph": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "white_text": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "quoted_thread": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "link_title": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "metadata_field": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "comment": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        }
+      },
+      "CREDENTIAL_THEFT": {
+        "noisy_visible": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "faint_text": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "hex": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "tiny_font": {
+          "count": 2,
+          "flagged": 1,
+          "recall": 0.5
+        },
+        "meta_tag": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "visible_paragraph": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "comment": {
+          "count": 2,
+          "flagged": 2,
+          "recall": 1.0
+        },
+        "quoted_thread": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "nested_value": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "docstring": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "confusable_chars": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "visible_text": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "spaced": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "offscreen": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        }
+      },
+      "CONTEXT_POISONING": {
+        "visible_paragraph": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "hidden_run": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "quoted_thread": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "inline_html": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "key_name": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "string_literal": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "noisy_visible": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "exif_comment": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "direct": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "comment": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "meta_tag": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "white_text": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "visible": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "html_hidden": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "image_alt": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "nested_value": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        }
+      },
+      "ENCODED_INSTRUCTIONS": {
+        "comment": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "confusable_chars": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "small_text": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "rot13": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "hidden_div": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "alt_text": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "white_text": {
+          "count": 2,
+          "flagged": 1,
+          "recall": 0.5
+        },
+        "html_hidden": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "link_title": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "key_name": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "string_literal": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "noisy_visible": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "faint_text": {
+          "count": 1,
+          "flagged": 0,
+          "recall": 0.0
+        },
+        "homoglyph": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        },
+        "tiny_font": {
+          "count": 1,
+          "flagged": 1,
+          "recall": 1.0
+        }
+      },
+      "MULTI_STEP_JAILBREAK": {
+        "multi_turn_split": {
+          "count": 16,
+          "flagged": 9,
+          "recall": 0.5625
+        }
+      }
+    },
+    "sanitization": {
+      "total_sanitized": 51,
+      "residual_count": 0,
+      "residual_attack_rate": 0.0,
+      "mean_retention": 0.4505
+    },
+    "latency": {
+      "p50_total_ms": 30.0,
+      "p95_total_ms": 63.73,
+      "layers": {
+        "l1_ingestion_ms": {
+          "p50_ms": 0.54,
+          "p95_ms": 3.79
+        },
+        "l2_normalize_ms": {
+          "p50_ms": 1.83,
+          "p95_ms": 4.96
+        },
+        "l3_detection_ms": {
+          "p50_ms": 26.38,
+          "p95_ms": 58.53
+        },
+        "l4_fusion_policy_ms": {
+          "p50_ms": 0.19,
+          "p95_ms": 0.39
+        },
+        "l5_neutralize_ms": {
+          "p50_ms": 0.0,
+          "p95_ms": 0.08
+        },
+        "total_ms": {
+          "p50_ms": 30.0,
+          "p95_ms": 63.73
+        },
+        "total_pipeline_ms": {
+          "p50_ms": 30.0,
+          "p95_ms": 63.73
+        }
+      }
+    }
+  }
+}

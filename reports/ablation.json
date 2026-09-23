@@ -1,0 +1,62 @@
+{
+  "split": "dev",
+  "total_items": 311,
+  "modes": {
+    "rules_only": {
+      "mode": "rules_only",
+      "enable_rules": true,
+      "enable_classifier": false,
+      "enable_judge": false,
+      "elapsed_seconds": 4.12,
+      "recall": 0.5495,
+      "precision": 0.9919,
+      "f1": 0.7072,
+      "fpr": 0.0112,
+      "tp": 122,
+      "fp": 1,
+      "tn": 88,
+      "fn": 100,
+      "p50_latency_ms": 9.32,
+      "p95_latency_ms": 15.14
+    },
+    "rules_plus_classifier": {
+      "mode": "rules_plus_classifier",
+      "enable_rules": true,
+      "enable_classifier": true,
+      "enable_judge": false,
+      "elapsed_seconds": 12.16,
+      "recall": 0.8063,
+      "precision": 0.8995,
+      "f1": 0.8504,
+      "fpr": 0.2247,
+      "tp": 179,
+      "fp": 20,
+      "tn": 69,
+      "fn": 43,
+      "p50_latency_ms": 26.89,
+      "p95_latency_ms": 74.4
+    },
+    "full_cascade": {
+      "mode": "full_cascade",
+      "enable_rules": true,
+      "enable_classifier": true,
+      "enable_judge": true,
+      "elapsed_seconds": 9.62,
+      "recall": 0.8063,
+      "precision": 0.8995,
+      "f1": 0.8504,
+      "fpr": 0.2247,
+      "tp": 179,
+      "fp": 20,
+      "tn": 69,
+      "fn": 43,
+      "p50_latency_ms": 24.2,
+      "p95_latency_ms": 52.22
+    }
+  },
+  "lift": {
+    "classifier_recall_lift": 0.2568,
+    "classifier_f1_lift": 0.1432,
+    "classifier_fpr_delta": 0.2135
+  }
+}

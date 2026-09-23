@@ -1,5 +1,6 @@
 """Policy configuration loader and validator (§4, §5.4, §8.3)."""
 
+import os
 from pathlib import Path
 from typing import Any
 import yaml
@@ -85,27 +86,34 @@ class PolicyConfig(BaseModel):
 
 
 _CACHED_POLICY: PolicyConfig | None = None
+_CACHED_POLICY_DEMO: bool | None = None
 
 
 def load_policy(path: str | Path | None = None) -> PolicyConfig:
     """Load and validate policy configuration from YAML file."""
-    global _CACHED_POLICY
+    global _CACHED_POLICY, _CACHED_POLICY_DEMO
     target_path = Path(path) if path else DEFAULT_POLICY_PATH
     if not target_path.exists():
-        _CACHED_POLICY = PolicyConfig()
-        return _CACHED_POLICY
+        config = PolicyConfig()
+    else:
+        with open(target_path, "r", encoding="utf-8") as f:
+            raw_data = yaml.safe_load(f) or {}
+        config = PolicyConfig.model_validate(raw_data)
 
-    with open(target_path, "r", encoding="utf-8") as f:
-        raw_data = yaml.safe_load(f) or {}
+    is_demo = os.environ.get("DEMO_MODE", "0").strip() == "1"
+    if is_demo:
+        config.limits.max_upload_bytes = 2 * 1024 * 1024
+        config.limits.max_pdf_pages = 20
+        config.limits.max_image_megapixels = 5
 
-    config = PolicyConfig.model_validate(raw_data)
     _CACHED_POLICY = config
+    _CACHED_POLICY_DEMO = is_demo
     return config
 
 
 def save_policy(policy_data: dict[str, Any], path: str | Path | None = None) -> PolicyConfig:
     """Validate, write, and reload policy configuration."""
-    global _CACHED_POLICY
+    global _CACHED_POLICY, _CACHED_POLICY_DEMO
     target_path = Path(path) if path else DEFAULT_POLICY_PATH
     config = PolicyConfig.model_validate(policy_data)
 
@@ -114,12 +122,14 @@ def save_policy(policy_data: dict[str, Any], path: str | Path | None = None) -> 
         yaml.safe_dump(policy_data, f, default_flow_style=False, sort_keys=False)
 
     _CACHED_POLICY = config
+    _CACHED_POLICY_DEMO = (os.environ.get("DEMO_MODE", "0").strip() == "1")
     return config
 
 
 def get_policy() -> PolicyConfig:
     """Get currently active policy configuration or load default."""
-    global _CACHED_POLICY
-    if _CACHED_POLICY is None:
+    global _CACHED_POLICY, _CACHED_POLICY_DEMO
+    is_demo = os.environ.get("DEMO_MODE", "0").strip() == "1"
+    if _CACHED_POLICY is None or _CACHED_POLICY_DEMO != is_demo:
         return load_policy()
     return _CACHED_POLICY

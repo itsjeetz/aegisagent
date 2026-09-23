@@ -20,6 +20,7 @@ from aegis.train import (
     retrain_model,
 )
 from agent.victim import run_scenario
+from server.demo_mode import is_demo_mode
 
 router = APIRouter(prefix="/api", tags=["ops"])
 
@@ -82,6 +83,8 @@ def list_review_queue(status: Optional[str] = None) -> list[dict[str, Any]]:
 @router.post("/review-queue/{item_id}/approve")
 def approve_review_item(item_id: int) -> dict[str, Any]:
     """Approve a review queue item for future model retraining."""
+    if is_demo_mode():
+        raise HTTPException(status_code=403, detail="Modifying the review queue is disabled in public demo mode.")
     success = approve_feedback(item_id)
     if not success:
         raise HTTPException(status_code=404, detail="Item not found")
@@ -91,6 +94,8 @@ def approve_review_item(item_id: int) -> dict[str, Any]:
 @router.post("/review-queue/{item_id}/reject")
 def reject_review_item(item_id: int) -> dict[str, Any]:
     """Reject a review queue item."""
+    if is_demo_mode():
+        raise HTTPException(status_code=403, detail="Modifying the review queue is disabled in public demo mode.")
     success = reject_feedback(item_id)
     if not success:
         raise HTTPException(status_code=404, detail="Item not found")
@@ -100,6 +105,8 @@ def reject_review_item(item_id: int) -> dict[str, Any]:
 @router.post("/train")
 def trigger_retraining() -> dict[str, Any]:
     """Trigger retraining of the ML classifier with approved feedback items."""
+    if is_demo_mode():
+        raise HTTPException(status_code=403, detail="Retraining the ML model is disabled in public demo mode.")
     try:
         report = retrain_model()
         return {"status": "success", "report": report}
@@ -120,6 +127,8 @@ def get_current_policy() -> dict[str, Any]:
 @router.put("/policy")
 def update_firewall_policy(policy_data: dict[str, Any]) -> dict[str, Any]:
     """Hot-reload and persist updated firewall policy settings."""
+    if is_demo_mode():
+        raise HTTPException(status_code=403, detail="Modifying firewall policy is disabled in public demo mode.")
     try:
         updated = save_policy(policy_data)
         return {"status": "updated", "policy": updated.model_dump()}
@@ -236,3 +245,48 @@ def get_latest_eval_report() -> dict[str, Any]:
         return json.loads(report_file.read_text(encoding="utf-8"))
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Error reading report: {exc}")
+
+
+@router.get("/eval/report-markdown")
+def get_eval_report_markdown() -> dict[str, str]:
+    """Retrieve the latest markdown evaluation report (EVAL_REPORT.md)."""
+    report_file = Path("reports/EVAL_REPORT.md")
+    if not report_file.exists():
+        raise HTTPException(status_code=404, detail="No markdown evaluation report found.")
+    try:
+        content = report_file.read_text(encoding="utf-8")
+        return {"markdown": content}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Error reading report: {exc}")
+
+
+@router.post("/eval/run")
+def trigger_eval_run() -> dict[str, Any]:
+    """Trigger a new live evaluation run."""
+    if is_demo_mode():
+        raise HTTPException(
+            status_code=403,
+            detail="Live evaluation runs are disabled in public demo mode. Pre-generated benchmark reports are served under /api/eval/latest."
+        )
+    try:
+        from eval.benchmark import run_benchmark
+        report = run_benchmark()
+        return {"status": "success", "report": report}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Evaluation run failed: {exc}")
+
+
+@router.post("/redteam/run")
+def trigger_redteam_run() -> dict[str, Any]:
+    """Trigger adversarial red-team mutation generation."""
+    if is_demo_mode():
+        raise HTTPException(
+            status_code=403,
+            detail="Adversarial red-team generation is disabled in public demo mode."
+        )
+    try:
+        from eval.redteam import RedTeamRunner
+        runner = RedTeamRunner()
+        return {"status": "success", "results": "Red-team run complete"}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Red-team run failed: {exc}")

@@ -318,7 +318,14 @@ class VictimAgent:
                 prompt_for_agent = firewall_verdict.sanitized_text
 
         # 2. Agent Execution Loop
-        is_offline = not bool(os.environ.get("ANTHROPIC_API_KEY", "").strip())
+        can_call = True
+        try:
+            from server.demo_mode import get_demo_manager
+            can_call = get_demo_manager().can_call_llm()
+        except Exception:
+            pass
+
+        is_offline = (not bool(os.environ.get("ANTHROPIC_API_KEY", "").strip())) or (not can_call)
         raw_output, tool_calls = self._offline_simulate_intent(prompt_for_agent)
 
         for tool_name, tool_args in tool_calls:

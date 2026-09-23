@@ -109,3 +109,8 @@ class HealthResponse(BaseModel):
     agent_model: str
     hf_classifier_id: str | None = None
     degraded_mode: bool
+    demo_mode: bool = False
+    rate_limit_per_minute: int | None = None
+    daily_llm_calls_limit: int | None = None
+    daily_llm_calls_used: int | None = None
+    daily_llm_calls_remaining: int | None = None

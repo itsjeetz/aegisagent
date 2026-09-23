@@ -5,6 +5,12 @@ from pathlib import Path
 from fastapi import APIRouter
 from aegis.models import HealthResponse
 
+from server.demo_mode import (
+    DEFAULT_GENERAL_LIMIT_PER_MINUTE,
+    get_demo_manager,
+    is_demo_mode,
+)
+
 router = APIRouter(prefix="/api", tags=["health"])
 
 
@@ -35,7 +41,26 @@ def get_health() -> HealthResponse:
     """Return health status and capabilities of the firewall."""
     ocr_avail = is_ocr_available()
     api_key_set = bool(os.environ.get("ANTHROPIC_API_KEY", "").strip())
-    judge_avail = api_key_set
+    demo_active = is_demo_mode()
+    demo_mgr = get_demo_manager()
+
+    # In demo mode, judge is available only if API key is set AND remaining quota > 0
+    quota_exhausted = False
+    rate_limit = None
+    llm_limit = None
+    llm_used = None
+    llm_rem = None
+
+    if demo_active:
+        rate_limit = DEFAULT_GENERAL_LIMIT_PER_MINUTE
+        stats = demo_mgr.get_llm_stats()
+        llm_limit = stats["limit"]
+        llm_used = stats["used"]
+        llm_rem = stats["remaining"]
+        if llm_rem <= 0:
+            quota_exhausted = True
+
+    judge_avail = api_key_set and (not quota_exhausted)
     clf_backend = get_classifier_backend()
     judge_model = os.environ.get("JUDGE_MODEL", "claude-haiku-4-5-20251001")
     agent_model = os.environ.get("AGENT_MODEL", "claude-sonnet-5")
@@ -54,4 +79,9 @@ def get_health() -> HealthResponse:
         agent_model=agent_model,
         hf_classifier_id=hf_id,
         degraded_mode=degraded,
+        demo_mode=demo_active,
+        rate_limit_per_minute=rate_limit,
+        daily_llm_calls_limit=llm_limit,
+        daily_llm_calls_used=llm_used,
+        daily_llm_calls_remaining=llm_rem,
     )

@@ -86,7 +86,15 @@ class LLMJudge:
     @property
     def is_available(self) -> bool:
         key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
-        return bool(key) and self.circuit_breaker.can_execute()
+        if not key:
+            return False
+        try:
+            from server.demo_mode import get_demo_manager
+            if not get_demo_manager().can_call_llm():
+                return False
+        except Exception:
+            pass
+        return self.circuit_breaker.can_execute()
 
     def format_prompt_envelope(self, content: str) -> tuple[str, str]:
         """Wrap untrusted content in nonce envelope and escape delimiters (§5.3c)."""
@@ -138,6 +146,13 @@ class LLMJudge:
         if not api_key:
             return None, True
 
+        try:
+            from server.demo_mode import get_demo_manager
+            if not get_demo_manager().can_call_llm():
+                return None, True
+        except Exception:
+            pass
+
         envelope_prompt, nonce = self.format_prompt_envelope(text)
 
         try:
@@ -150,6 +165,12 @@ class LLMJudge:
                 system=JUDGE_SYSTEM_PROMPT,
                 messages=[{"role": "user", "content": envelope_prompt}],
             )
+
+            try:
+                from server.demo_mode import get_demo_manager
+                get_demo_manager().record_llm_call()
+            except Exception:
+                pass
 
             raw_reply = message.content[0].text if message.content else ""
             parsed = self.parse_judge_response(raw_reply)

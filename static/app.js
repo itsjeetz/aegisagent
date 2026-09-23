@@ -161,6 +161,41 @@ async function fetchHealthStatus() {
       valAgent.textContent = "MOCK (offline)";
       if (sandboxLabel) sandboxLabel.textContent = "MOCK (offline)";
     }
+
+    // Demo Mode Banner & Enforcement
+    const demoBanner = document.getElementById("demoBanner");
+    if (demoBanner) {
+      if (data.demo_mode) {
+        demoBanner.classList.remove("hidden");
+        const rateEl = document.getElementById("demoRateLimit");
+        if (rateEl) {
+          rateEl.textContent = `Rate Limit: ${data.rate_limit_per_minute || 30} req/min (5 req/min for agent)`;
+        }
+        const quotaEl = document.getElementById("demoLlmQuota");
+        if (quotaEl) {
+          const used = data.daily_llm_calls_used ?? 0;
+          const limit = data.daily_llm_calls_limit ?? 200;
+          const rem = data.daily_llm_calls_remaining ?? (limit - used);
+          quotaEl.textContent = `Daily LLM Quota: ${rem}/${limit} remaining`;
+        }
+
+        // Disable admin write buttons in UI with descriptive tooltip
+        const btnSavePolicy = document.getElementById("btnSavePolicy");
+        if (btnSavePolicy) {
+          btnSavePolicy.classList.add("btn-disabled-demo");
+          btnSavePolicy.title = "Modifying firewall policy is disabled in public demo mode.";
+          btnSavePolicy.setAttribute("disabled", "true");
+        }
+        const btnRetrain = document.getElementById("btnRetrainModel");
+        if (btnRetrain) {
+          btnRetrain.classList.add("btn-disabled-demo");
+          btnRetrain.title = "Model retraining is disabled in public demo mode.";
+          btnRetrain.setAttribute("disabled", "true");
+        }
+      } else {
+        demoBanner.classList.add("hidden");
+      }
+    }
   } catch (err) {
     console.error("Health fetch error:", err);
   }
@@ -470,6 +505,40 @@ function renderSandboxResult(data, container, statusElem, isProtected) {
 // ---------------------------------------------------------------------------
 function initEvalTab() {
   document.getElementById("btnRefreshEval").addEventListener("click", loadEvaluationReport);
+
+  const btnMd = document.getElementById("btnViewReportMarkdown");
+  const panelMd = document.getElementById("panelReportMarkdown");
+  const btnCloseMd = document.getElementById("btnCloseReportMarkdown");
+  const textMd = document.getElementById("textReportMarkdown");
+
+  if (btnMd && panelMd) {
+    btnMd.addEventListener("click", async () => {
+      const isHidden = panelMd.classList.contains("hidden");
+      if (isHidden) {
+        panelMd.classList.remove("hidden");
+        btnMd.classList.add("active");
+        try {
+          const res = await fetch("/api/eval/report-markdown");
+          if (!res.ok) throw new Error("Could not load EVAL_REPORT.md");
+          const data = await res.json();
+          textMd.textContent = data.markdown || "No markdown content.";
+        } catch (e) {
+          textMd.textContent = `Error loading markdown report: ${e.message}`;
+        }
+      } else {
+        panelMd.classList.add("hidden");
+        btnMd.classList.remove("active");
+      }
+    });
+  }
+
+  if (btnCloseMd && panelMd) {
+    btnCloseMd.addEventListener("click", () => {
+      panelMd.classList.add("hidden");
+      if (btnMd) btnMd.classList.remove("active");
+    });
+  }
+
   loadEvaluationReport();
 }
 

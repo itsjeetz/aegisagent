@@ -1,5 +1,6 @@
 """Fault tolerance, per-layer timeouts, circuit breakers, and degraded mode (§8.3)."""
 
+import os
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 import logging
 import time
@@ -19,6 +20,23 @@ MAX_IMAGE_PIXELS = 20_000_000  # 20 MP
 MAX_JSON_DEPTH = 20
 MAX_DECODE_DEPTH = 3
 MAX_VARIANTS = 12
+
+
+def is_demo_mode_active() -> bool:
+    return os.environ.get("DEMO_MODE", "0").strip() == "1"
+
+
+def get_max_upload_bytes() -> int:
+    return (2 * 1024 * 1024) if is_demo_mode_active() else MAX_UPLOAD_BYTES
+
+
+def get_max_pdf_pages() -> int:
+    return 20 if is_demo_mode_active() else MAX_PDF_PAGES
+
+
+def get_max_image_pixels() -> int:
+    return 5_000_000 if is_demo_mode_active() else MAX_IMAGE_PIXELS
+
 
 # Per-layer timeout thresholds in seconds (§8.3)
 TIMEOUTS = {
@@ -59,10 +77,12 @@ def run_with_timeout(
 
 def validate_input_limits(content: bytes | str, filename: Optional[str] = None) -> None:
     """Validate content size against safety caps (§8.3). Raises ValueError if exceeded."""
+    limit = get_max_upload_bytes()
     size_bytes = len(content.encode("utf-8")) if isinstance(content, str) else len(content)
-    if size_bytes > MAX_UPLOAD_BYTES:
+    if size_bytes > limit:
+        limit_mb = limit // (1024 * 1024)
         raise ValueError(
-            f"Content size {size_bytes} bytes exceeds maximum upload limit of {MAX_UPLOAD_BYTES} bytes (10 MB)."
+            f"Content size {size_bytes} bytes exceeds maximum upload limit of {limit} bytes ({limit_mb} MB)."
         )
 
 

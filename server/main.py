@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from server.demo_mode import DemoRateLimitMiddleware
 from server.routes_health import router as health_router
 from server.routes_inspect import router as inspect_router
 from server.routes_ops import router as ops_router
@@ -15,6 +16,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
+app.add_middleware(DemoRateLimitMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

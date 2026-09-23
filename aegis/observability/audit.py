@@ -55,8 +55,9 @@ class AuditLogger:
         session_id: Optional[str] = None,
     ) -> int:
         """Log a pipeline verdict to audit_log table (§8.1)."""
-        # Excerpt preparation: do not store raw content unless STORE_CONTENT=1
-        store_raw = os.environ.get("STORE_CONTENT", "0").strip() == "1"
+        # Excerpt preparation: do not store raw content unless STORE_CONTENT=1, and never in DEMO_MODE
+        is_demo = os.environ.get("DEMO_MODE", "0").strip() == "1"
+        store_raw = (os.environ.get("STORE_CONTENT", "0").strip() == "1") and not is_demo
 
         if store_raw:
             if isinstance(content, bytes):
