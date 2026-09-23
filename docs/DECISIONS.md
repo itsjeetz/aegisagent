@@ -108,4 +108,14 @@ This document records technical and design decisions made during the development
   3. **Honest Capability Badges (§0 Rule 2):** Top navigation status bar reflects live capabilities from `GET /api/health`, clearly labeling the victim agent as `MOCK (offline)` and marking missing host binaries (such as Tesseract OCR) as offline rather than concealing degradation.
 - **Status:** Approved.
 
+### DEC-012: Final Frozen Test Evaluation, Empirical Claims, and Project Wrap-up (Phase 9 & 10)
+- **Context:** Section 9 and 12 require verifying test split freeze integrity, executing full cascade evaluation against `data/test.jsonl`, generating `docs/CLAIMS.md` purely from measurements, and delivering comprehensive architecture (`docs/ARCHITECTURE.md`), demonstration rehearsal script (`docs/DEMO_SCRIPT.md`), and `README.md`.
+- **Decision:**
+  1. **Strict Frozen Test Protocol (§9.3, §0 Rule 3):** Evaluation verified `data/test.frozen.sha256` (`c9721c9e17077e1b70a3ff55a5e3b084e080773a54d45c00e08afe5acd02ed0d`). The full multi-layer cascade (Rules + ML Classifier + Judge) was evaluated without prior inspection or tuning on the test split.
+  2. **Empirically Grounded Claims (§0 Rule 4):** Generated `docs/CLAIMS.md` purely from measurements: overall recall of 65.28% on the held-out test split, 1.92% FPR on hard negatives, 0.00% residual attack rate after neutralization, and p95 latency of 63.73 ms. Declared grid position strictly aligns with measured outcomes.
+  3. **Complete Architectural and Presentation Artifacts (§14):** Delivered `docs/ARCHITECTURE.md` (multi-layer dataflow, coordinate mapping, runtime guard architecture, model usage breakdown) and `docs/DEMO_SCRIPT.md` (step-by-step walkthrough covering inspector presets, victim agent side-by-side execution, evaluation metrics, and live policy hot-reloading).
+  4. **Definition of Done Fulfilled:** All 10 checklist items in Appendix B of the implementation plan are satisfied.
+- **Status:** Approved.
+
+
 

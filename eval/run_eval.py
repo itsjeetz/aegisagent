@@ -40,6 +40,7 @@ def run_evaluation(
     split: str = "dev",
     out_dir: str = "reports",
     claims_out: str = "docs/CLAIMS.md",
+    mode: str = "cascade",
 ) -> tuple[dict, str]:
     """Run full evaluation suite on the given split."""
     test_hash_info = None
@@ -61,10 +62,13 @@ def run_evaluation(
             sys.exit(1)
 
     items = load_dataset(split)
-    pipeline = FirewallPipeline()
+    if mode == "rules_only":
+        pipeline = FirewallPipeline(enable_rules=True, enable_classifier=False, enable_judge=False)
+    else:
+        pipeline = FirewallPipeline(enable_rules=True, enable_classifier=True, enable_judge=True)
 
     evaluations: list[ItemEvaluation] = []
-    print(f"Starting evaluation on {split.upper()} split ({len(items)} items)...")
+    print(f"Starting evaluation on {split.upper()} split ({len(items)} items, mode={mode})...")
     t_start = time.perf_counter()
 
     for idx, item in enumerate(items, 1):
@@ -131,7 +135,7 @@ def run_evaluation(
         split=split,
         out_dir=out_dir,
         test_hash_info=test_hash_info,
-        mode="rules_only",
+        mode=mode,
     )
 
     # Also sync to docs/EVAL_REPORT.md for repository documentation
@@ -144,7 +148,7 @@ def run_evaluation(
     report_data = {
         "metadata": {
             "split": split,
-            "mode": "rules_only",
+            "mode": mode,
             "test_hash_info": test_hash_info,
         },
         "metrics": metrics,
@@ -164,7 +168,7 @@ def run_evaluation(
     s = metrics["sanitization"]
     l = metrics["latency"]
     print("\n" + "=" * 65)
-    print(f"EVALUATION SUMMARY: {split.upper()} SPLIT (Rules-Only Baseline)")
+    print(f"EVALUATION SUMMARY: {split.upper()} SPLIT (Mode: {mode})")
     print("=" * 65)
     print(f"  Total items evaluated: {b['total_items']}")
     print(f"  Attacks: {b['total_attacks']} | Benign: {b['total_benign']}")
@@ -186,11 +190,12 @@ def run_evaluation(
 def main() -> None:
     parser = argparse.ArgumentParser(description="AegisAgent Benchmark Evaluation Runner")
     parser.add_argument("--split", choices=["dev", "test"], default="dev", help="Dataset split to evaluate")
+    parser.add_argument("--mode", choices=["cascade", "rules_only"], default="cascade", help="Firewall detection mode")
     parser.add_argument("--out", default="reports", help="Output directory for reports")
     parser.add_argument("--claims-out", default="docs/CLAIMS.md", help="Path for generated CLAIMS.md")
     args = parser.parse_args()
 
-    run_evaluation(split=args.split, out_dir=args.out, claims_out=args.claims_out)
+    run_evaluation(split=args.split, out_dir=args.out, claims_out=args.claims_out, mode=args.mode)
 
 
 if __name__ == "__main__":
