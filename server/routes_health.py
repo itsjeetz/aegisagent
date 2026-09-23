@@ -25,9 +25,8 @@ def get_classifier_backend() -> str:
     if hf_id:
         return f"hf:{hf_id}"
 
-    model_path = Path("data/models/clf.joblib")
-    if model_path.exists():
-        return "sklearn"
+    if Path("data/models/classifier.joblib").exists() or Path("data/models/clf.joblib").exists():
+        return "scikit-learn"
     return "none (untrained)"
 
 
