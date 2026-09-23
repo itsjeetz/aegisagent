@@ -31,25 +31,31 @@ def merge_spans(spans: list[tuple[int, int, AttackType]]) -> list[tuple[int, int
 
 def redact_segment(segment: Segment, findings: list[Finding]) -> str:
     """Redact flagged spans on the ORIGINAL segment text (§5.5).
-    If any finding lacks a span (e.g. session-level or global finding), redacts the whole segment.
+    If findings have localized spans, redacts those exact spans.
+    If NO finding has a localized span, redacts the whole segment.
     """
     if not findings:
         return segment.text
 
-    # Check if any finding requires whole-segment redaction
-    for f in findings:
-        if f.span_original is None:
-            return f"[REDACTED:{f.attack_type.value}]"
+    seg_len = len(segment.text)
+    localized_findings = [
+        f for f in findings
+        if f.span_original is not None and (f.span_original[1] - f.span_original[0]) < seg_len
+    ]
+
+    # If no localized findings exist at all, fall back to whole-segment redaction
+    if not localized_findings:
+        chosen_type = findings[0].attack_type
+        return f"[REDACTED:{chosen_type.value}]"
 
     spans_to_redact = []
-    for f in findings:
-        if f.span_original:
-            start, end = f.span_original
-            # Clamp bounds
-            start = max(0, min(start, len(segment.text)))
-            end = max(0, min(end, len(segment.text)))
-            if start < end:
-                spans_to_redact.append((start, end, f.attack_type))
+    for f in localized_findings:
+        start, end = f.span_original
+        # Clamp bounds
+        start = max(0, min(start, seg_len))
+        end = max(0, min(end, seg_len))
+        if start < end:
+            spans_to_redact.append((start, end, f.attack_type))
 
     if not spans_to_redact:
         return segment.text

@@ -6,9 +6,8 @@ import time
 from typing import TYPE_CHECKING
 
 from aegis.detection.base import DetectionContext
+from aegis.detection.cascade import DetectionCascade
 from aegis.detection.fusion import fuse_findings
-from aegis.detection.instruction_in_data import InstructionInDataDetector
-from aegis.detection.rules import RuleDetector
 from aegis.detection.session import SessionTracker
 from aegis.ingestion.registry import extract
 from aegis.models import (
@@ -32,10 +31,21 @@ if TYPE_CHECKING:
 class FirewallPipeline:
     """End-to-end prompt injection firewall pipeline (§2)."""
 
-    def __init__(self, policy: PolicyConfig | None = None):
+    def __init__(
+        self,
+        policy: PolicyConfig | None = None,
+        enable_rules: bool = True,
+        enable_classifier: bool = True,
+        enable_judge: bool = True,
+    ):
         self.policy = policy or get_policy()
-        self.rule_detector = RuleDetector(self.policy)
-        self.iid_detector = InstructionInDataDetector(self.policy)
+        self.cascade = DetectionCascade(
+            policy=self.policy,
+            enable_rules=enable_rules,
+            enable_classifier=enable_classifier,
+            enable_judge=enable_judge,
+        )
+        self.rule_detector = self.cascade.rule_detector
         self.session_tracker = SessionTracker(policy=self.policy)
         self.policy_engine = PolicyEngine(self.policy)
 
@@ -94,13 +104,10 @@ class FirewallPipeline:
                 is_hidden=(seg.origin == "hidden"),
             )
 
-            # L3a: Rules
-            rule_findings = self.rule_detector.detect(seg, variants, ctx)
-            all_findings.extend(rule_findings)
-
-            # L3a: Instruction-in-data
-            iid_findings = self.iid_detector.detect(seg, variants, ctx)
-            all_findings.extend(iid_findings)
+            # L3: Run cascade (Rules -> Classifier -> Judge)
+            cascade_findings, c_status = self.cascade.detect(seg, variants, ctx)
+            all_findings.extend(cascade_findings)
+            layer_status.update(c_status)
 
         # L3d: Session Tracker (if session_id provided)
         if session_id:

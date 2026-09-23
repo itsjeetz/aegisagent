@@ -66,3 +66,12 @@ This document records technical and design decisions made during the development
   3. **Strict Test Freeze Enforcement:** `verify_test_freeze()` checks the SHA-256 of `data/test.jsonl` against `data/test.frozen.sha256`. If mismatched, `eval/run_eval.py --split test` immediately halts with an error, preventing test-split data leakage or post-hoc tampering.
   4. **Automated Claims Reporting:** `eval/claims.py` consumes `reports/report.json` and writes `docs/CLAIMS.md` purely from measured numbers, fulfilling Section 0 Rule 4.
 - **Status:** Approved.
+
+### DEC-008: Detection Cascade, ML Classifier Scoring, and Hardened Judge (Phase 5)
+- **Context:** Section 5.3b and 5.3c require an ML classifier and an LLM judge with §5.3c hardening, orchestrated in a cascade, with ablation demonstrating measured lift on dev.
+- **Decision:**
+  1. **Category Attribution per §5.3b:** The ML classifier provides a generic $P(\text{injection})$. It contributes its probability to attack categories via the rules' labels, or emits `INDIRECT_PROMPT_INJECTION` for untrusted sources, rather than inventing unverified rule categories on clean user messages.
+  2. **Non-Destructive Span Redaction:** `redact_segment()` prioritizes localized spans identified by rules. A whole-segment redaction is only performed if no localized spans exist, preserving benign context around detected injections.
+  3. **LLM Judge Hardening:** The judge enforces a nonce-delimited envelope with escaped delimiter lookalikes, strict Pydantic JSON validation (treating malformed outputs as "no opinion"), and a circuit breaker that trips after 3 consecutive failures.
+  4. **Measured Ablation Lift:** On the dev split, adding the ML classifier to the rules cascade increased recall from 54.95% to 80.63% (+25.68% lift) and F1 from 0.7072 to 0.8504 (+0.1432 lift).
+- **Status:** Approved.
