@@ -1,0 +1,80 @@
+version: "2.0"
+
+thresholds:
+  allow_below: 0.25
+  block_at: 0.85
+  judge_low: 0.35
+  judge_high: 0.75
+  judge_can_downgrade_below: 0.60
+  session_threshold: 0.70
+  session_decay: 0.70
+  hidden_boost: 0.15
+  encoded_boost: 0.05
+  instruction_in_data_base_visible: 0.40
+  instruction_in_data_base_hidden: 0.65
+
+high_severity_categories:
+  - CREDENTIAL_THEFT
+  - TOOL_ABUSE
+high_severity_threshold: 0.60
+
+source_multipliers:
+  user_message: 1.0
+  web_page: 1.10
+  pdf: 1.10
+  email: 1.20
+  markdown: 1.10
+  html: 1.10
+  docx: 1.10
+  api_response: 1.15
+  ocr_text: 1.10
+  source_code: 1.15
+  image: 1.15
+
+limits:
+  max_upload_bytes: 10485760       # 10 MB
+  max_pdf_pages: 200
+  max_image_megapixels: 20
+  max_json_depth: 20
+  max_decode_depth: 3
+  max_variants_per_segment: 12
+  max_decoded_blob_bytes: 65536     # 64 KB
+  max_zip_uncompressed_bytes: 52428800 # 50 MB zip bomb limit
+  max_segment_chars: 100000
+
+timeouts_seconds:
+  rules: 0.50
+  classifier: 1.00
+  judge: 8.00
+  ocr: 10.00
+
+resilience:
+  fail_mode: "closed"               # closed | open
+  judge_max_retries: 1
+  circuit_breaker:
+    failure_threshold: 3
+    recovery_time_seconds: 60
+
+tool_tiers:
+  READ_PUBLIC:
+    - fetch_url
+    - read_email
+  READ_SENSITIVE:
+    - read_file
+  WRITE_LOCAL:
+    - write_note
+  EGRESS:
+    - send_email
+    - post_http
+  EXEC_DESTRUCTIVE:
+    - run_bash
+    - run_sql
+
+allowed_egress_domains:
+  - company.local
+  - safe.internal
+
+allowed_sql_tables:
+  - users
+  - inventory
+  - products
