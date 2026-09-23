@@ -75,3 +75,12 @@ This document records technical and design decisions made during the development
   3. **LLM Judge Hardening:** The judge enforces a nonce-delimited envelope with escaped delimiter lookalikes, strict Pydantic JSON validation (treating malformed outputs as "no opinion"), and a circuit breaker that trips after 3 consecutive failures.
   4. **Measured Ablation Lift:** On the dev split, adding the ML classifier to the rules cascade increased recall from 54.95% to 80.63% (+25.68% lift) and F1 from 0.7072 to 0.8504 (+0.1432 lift).
 - **Status:** Approved.
+
+### DEC-009: Runtime Guards (G1-G3) and Victim Agent Simulation (Phase 6)
+- **Context:** Section 6 and 7 require tool guard (tiers + taint + argument validation), egress guard (canary + credential + prompt leakage), memory guard (persistence + context poisoning), and victim agent evaluating scenarios S1-S9 and B1-B3.
+- **Decision:**
+  1. **Taint Enforcement & Tiers:** `ToolGuard` enforces strict tiers where tainted context unconditionally denies `EGRESS` and `EXEC_DESTRUCTIVE` tools unless user confirmation is granted, and denies `READ_SENSITIVE` if active attack findings exist.
+  2. **Multi-Vector Egress Protection:** `EgressGuard` scans outbound responses for session canary tokens, credential patterns (AWS, API keys, JWTs), system prompt n-gram leakage, and markdown rendering image exfiltration.
+  3. **Realistic Mock Tool Sandboxing (§0 Rule 5):** All agent tools (`send_email`, `run_sql`, `run_bash`, `transfer_funds`, `read_file`, `write_file`) are non-destructive mocks operating on in-memory SQLite and local `demo_data/`.
+  4. **Measured ASR Reduction:** Attack success rate was measured directly from tool execution logs: dropping from 88.9% (unprotected) to 0.0% (protected), while all benign utility tasks (B1-B3) succeeded without hindrance.
+- **Status:** Approved.
