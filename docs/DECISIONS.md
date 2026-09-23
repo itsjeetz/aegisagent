@@ -38,3 +38,12 @@ This document records technical and design decisions made during the development
   - Used `PIL.Image` and `PIL.ImageDraw` for image synthesis with EXIF metadata chunks.
   - Used in-memory `zipfile` for bit-exact WordprocessingML package creation.
 - **Status:** Approved.
+
+### DEC-005: Normalization, Offset Mapping, and Deobfuscation (Phase 2)
+- **Context:** Section 5.2 requires all text transformations to maintain character-level offset maps back to the original document text. Furthermore, obfuscated tokens (such as Base64, Hex, or despaced runs) must map back to the exact outer encoded token span in the original text, while enforcing caps (depth <= 3, variants <= 12, blob <= 64 KB).
+- **Decision:**
+  1. Implemented `MappedText` with `replace_spans` for single-pass non-overlapping batch token replacements, avoiding repeated string allocations.
+  2. In `decode_base64`, used negative lookahead `(?![A-Za-z0-9+/_-])` instead of word boundary `\b` after padding characters to ensure trailing `=` signs are cleanly included in the detected span.
+  3. Included zero-width spaces (`ZERO_WIDTH_CODEPOINTS`) and Unicode tag codepoints in the printable UTF-8 calculation for decoded binary/base64/hex payloads to seamlessly support chained multi-layer evasions (e.g. Base64 containing zero-width spaces).
+  4. Enforced BFS variant generation capped at 12 unique variants and 3 recursion steps, deduplicating text strings to maximize detector diversity.
+- **Status:** Approved.
