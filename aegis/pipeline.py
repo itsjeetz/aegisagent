@@ -1,4 +1,4 @@
-"""AegisAgent Pipeline orchestrating L1 Ingestion through L5 Neutralization (§2, §5)."""
+"""AegisAgent Pipeline orchestrating L1 Ingestion through L5 Neutralization (§2, §5, §8)."""
 
 import hashlib
 import secrets
@@ -21,15 +21,22 @@ from aegis.models import (
 from aegis.neutralize.envelope import wrap_in_nonce_envelope
 from aegis.neutralize.redact import redact_all_segments
 from aegis.normalize.deobfuscate import deobfuscate
+from aegis.observability.audit import get_audit_logger
+from aegis.observability.metrics import get_metrics_tracker
 from aegis.policy.config import PolicyConfig, get_policy
 from aegis.policy.engine import PolicyEngine
+from aegis.resilience import (
+    adjust_policy_for_degraded_mode,
+    fail_closed_verdict,
+    validate_input_limits,
+)
 
 if TYPE_CHECKING:
     pass
 
 
 class FirewallPipeline:
-    """End-to-end prompt injection firewall pipeline (§2)."""
+    """End-to-end prompt injection firewall pipeline (§2, §8)."""
 
     def __init__(
         self,
@@ -63,6 +70,9 @@ class FirewallPipeline:
         t_start = time.perf_counter()
         timings: dict[str, float] = {}
         layer_status: dict[str, dict] = {}
+
+        # Content size validation (§8.3)
+        validate_input_limits(content, filename=filename)
 
         # Content hash
         content_bytes = content.encode("utf-8") if isinstance(content, str) else content
@@ -109,6 +119,20 @@ class FirewallPipeline:
             all_findings.extend(cascade_findings)
             layer_status.update(c_status)
 
+        # Check if rules layer failed -> Fail closed (§8.3)
+        if layer_status.get("rules", {}).get("status") == "degraded_error":
+            verdict = fail_closed_verdict(
+                request_id=request_id,
+                source=detected_source,
+                trust=resolved_trust,
+                content_sha256=content_sha256,
+                layer_status=layer_status,
+                error_msg=layer_status["rules"].get("error", "Rules execution failure"),
+            )
+            get_audit_logger().log_verdict(verdict, content=content, session_id=session_id)
+            get_metrics_tracker().record(verdict)
+            return verdict
+
         # L3d: Session Tracker (if session_id provided)
         if session_id:
             combined_user_text = " ".join(s.text for s in segments if s.text.strip())
@@ -122,7 +146,6 @@ class FirewallPipeline:
 
         timings["l2_normalize_ms"] = round(timings.get("l2_normalize_ms", 0.0), 2)
         timings["l3_detection_ms"] = round((time.perf_counter() - t_l2_l3) * 1000 - timings["l2_normalize_ms"], 2)
-        layer_status["rules"] = {"status": "ok", "findings_count": len(all_findings)}
 
         # ----------------------------------------------------
         # L4: Fusion and Policy
@@ -133,9 +156,20 @@ class FirewallPipeline:
 
         risk, category_scores = fuse_findings(all_findings, source_mult, is_hidden, self.policy)
 
+        # Check degraded status across layers (§8.3)
+        is_degraded = any(
+            st.get("status", "").startswith("degraded")
+            for st in layer_status.values()
+        )
+
+        effective_policy = (
+            adjust_policy_for_degraded_mode(self.policy) if is_degraded else self.policy
+        )
+        effective_engine = PolicyEngine(effective_policy)
+
         # Check localizable spans: can we redact spans or is whole-document redaction needed?
         has_localizable = all(f.span_original is not None for f in all_findings) if all_findings else True
-        action = self.policy_engine.evaluate(
+        action = effective_engine.evaluate(
             risk=risk,
             category_scores=category_scores,
             findings=all_findings,
@@ -180,7 +214,7 @@ class FirewallPipeline:
         timings["total_pipeline_ms"] = total_time
         timings["total_ms"] = total_time
 
-        return Verdict(
+        verdict = Verdict(
             request_id=request_id,
             source=detected_source,
             trust=resolved_trust,
@@ -188,13 +222,22 @@ class FirewallPipeline:
             risk=round(risk, 4),
             category_scores=category_scores,
             findings=all_findings,
-            degraded=False,
+            degraded=is_degraded,
             layer_status=layer_status,
             sanitized_text=sanitized_text,
             envelope_text=envelope_text,
             timings_ms=timings,
             content_sha256=content_sha256,
         )
+
+        # Observability: log audit entry & record metrics (§8.1)
+        try:
+            get_audit_logger().log_verdict(verdict, content=content, session_id=session_id)
+            get_metrics_tracker().record(verdict)
+        except Exception:
+            pass
+
+        return verdict
 
 
 _PIPELINE_INSTANCE = FirewallPipeline()

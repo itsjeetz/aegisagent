@@ -92,7 +92,6 @@ def load_policy(path: str | Path | None = None) -> PolicyConfig:
     global _CACHED_POLICY
     target_path = Path(path) if path else DEFAULT_POLICY_PATH
     if not target_path.exists():
-        # Fall back to default config if file does not exist
         _CACHED_POLICY = PolicyConfig()
         return _CACHED_POLICY
 
@@ -100,6 +99,20 @@ def load_policy(path: str | Path | None = None) -> PolicyConfig:
         raw_data = yaml.safe_load(f) or {}
 
     config = PolicyConfig.model_validate(raw_data)
+    _CACHED_POLICY = config
+    return config
+
+
+def save_policy(policy_data: dict[str, Any], path: str | Path | None = None) -> PolicyConfig:
+    """Validate, write, and reload policy configuration."""
+    global _CACHED_POLICY
+    target_path = Path(path) if path else DEFAULT_POLICY_PATH
+    config = PolicyConfig.model_validate(policy_data)
+
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(target_path, "w", encoding="utf-8") as f:
+        yaml.safe_dump(policy_data, f, default_flow_style=False, sort_keys=False)
+
     _CACHED_POLICY = config
     return config
 

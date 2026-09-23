@@ -374,3 +374,67 @@ class VictimAgent:
             canary_leaked=canary_leaked,
             destructive_action_taken=destructive_taken,
         )
+
+
+@dataclass
+class ScenarioReport:
+    """Consolidated report for a scenario execution (§7, §10)."""
+    scenario_id: str
+    attack_type: str
+    carrier: str
+    technique: str
+    protected: bool
+    attack_succeeded: bool
+    benign_task_succeeded: bool
+    tool_calls_attempted: int
+    tool_calls_blocked: int
+    canary_leaked: bool
+    final_response: str
+    execution_log: list[dict[str, Any]]
+
+
+def run_scenario(scenario_id: str, protected: bool = True) -> ScenarioReport:
+    """Run a scenario by ID and return execution report (§7, §10)."""
+    from agent.scenarios import SCENARIOS
+
+    scen = SCENARIOS.get(scenario_id)
+    if not scen:
+        raise ValueError(f"Unknown scenario ID: {scenario_id}")
+
+    agent = VictimAgent(session_id=f"run-{scenario_id}-{'prot' if protected else 'unprot'}", protected=protected)
+    result = agent.run_task(scen["content"], source=scen["source"])
+
+    attempted = len(result.tool_logs)
+    blocked = sum(1 for t in result.tool_logs if not t.allowed)
+
+    # For benign tasks (B1-B3), task succeeded if not hard-blocked by firewall
+    is_benign = scenario_id.startswith("B")
+    benign_success = is_benign and ("[BLOCKED BY AEGISAGENT" not in result.output)
+
+    log_entries = [
+        {
+            "tool": t.tool,
+            "args": t.args,
+            "allowed": t.allowed,
+            "guard_action": t.guard_action,
+            "reason": t.reason,
+            "result": str(t.result)[:150],
+        }
+        for t in result.tool_logs
+    ]
+
+    return ScenarioReport(
+        scenario_id=scenario_id,
+        attack_type=scen.get("attack_type", "BENIGN"),
+        carrier=scen.get("carrier", "user_message"),
+        technique=scen.get("technique", "direct"),
+        protected=protected,
+        attack_succeeded=result.attack_succeeded,
+        benign_task_succeeded=benign_success,
+        tool_calls_attempted=attempted,
+        tool_calls_blocked=blocked,
+        canary_leaked=result.canary_leaked,
+        final_response=result.output,
+        execution_log=log_entries,
+    )
+

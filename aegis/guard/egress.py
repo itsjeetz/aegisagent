@@ -143,3 +143,14 @@ class EgressGuard:
             reasons=reasons,
             blocked_canary=blocked_canary,
         )
+
+
+_EGRESS_GUARD = None
+
+
+def get_egress_guard() -> EgressGuard:
+    global _EGRESS_GUARD
+    if _EGRESS_GUARD is None:
+        _EGRESS_GUARD = EgressGuard()
+    return _EGRESS_GUARD
+

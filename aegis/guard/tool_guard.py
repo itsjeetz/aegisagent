@@ -212,3 +212,14 @@ class ToolGuard:
             reason="Tool call permitted by guard policy",
             tainted=ctx.tainted,
         )
+
+
+_TOOL_GUARD = None
+
+
+def get_tool_guard() -> ToolGuard:
+    global _TOOL_GUARD
+    if _TOOL_GUARD is None:
+        _TOOL_GUARD = ToolGuard()
+    return _TOOL_GUARD
+

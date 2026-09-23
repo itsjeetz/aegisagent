@@ -73,3 +73,14 @@ class MemoryGuard:
             findings=findings,
             reasons=reasons,
         )
+
+
+_MEMORY_GUARD = None
+
+
+def get_memory_guard() -> MemoryGuard:
+    global _MEMORY_GUARD
+    if _MEMORY_GUARD is None:
+        _MEMORY_GUARD = MemoryGuard()
+    return _MEMORY_GUARD
+

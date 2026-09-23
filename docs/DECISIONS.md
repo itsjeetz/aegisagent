@@ -84,3 +84,14 @@ This document records technical and design decisions made during the development
   3. **Realistic Mock Tool Sandboxing (§0 Rule 5):** All agent tools (`send_email`, `run_sql`, `run_bash`, `transfer_funds`, `read_file`, `write_file`) are non-destructive mocks operating on in-memory SQLite and local `demo_data/`.
   4. **Measured ASR Reduction:** Attack success rate was measured directly from tool execution logs: dropping from 88.9% (unprotected) to 0.0% (protected), while all benign utility tasks (B1-B3) succeeded without hindrance.
 - **Status:** Approved.
+
+### DEC-010: Ops Features, Resilience, Retraining, and Red-Team Loop (Phase 7)
+- **Context:** Section 8 requires structured audit logging, performance metrics with percentiles, human-in-the-loop feedback with model retraining, fault tolerance (per-layer timeouts, degraded mode, fail-closed policy), and an adversarial red-team loop logging bypasses.
+- **Decision:**
+  1. **Privacy-Preserving Audit Logging (§8.1):** Structured entries are persisted to SQLite `data/audit.sqlite`. To protect confidentiality, raw content is never stored unless `STORE_CONTENT=1`; instead, a SHA-256 hash and redacted excerpt are logged.
+  2. **Continuity-Aware Metrics (§8.1):** `MetricsTracker` records thread-safe in-memory latencies and counters with percentile calculations (p50/p95). If in-memory state is empty (e.g. fresh process restart), it aggregates historical counts directly from `data/audit.sqlite`.
+  3. **Layer Timeouts, Degraded Mode & Fail-Closed (§8.3):** Implemented `run_with_timeout` using thread pools. If an active layer (e.g. Judge or Classifier) times out or raises an exception, the pipeline gracefully marks the verdict `degraded=True` and applies stricter policy thresholds (`allow_below - 0.10`). If the rules layer itself fails, it fails closed (`BLOCK` for untrusted sources, `ESCALATE` for direct user messages).
+  4. **Review Queue and Retraining (§8.2):** User submissions to `POST /api/feedback` enter `review_queue`. Once approved by a reviewer, `python -m aegis.train` merges them with the dev split, retrains the TF-IDF char n-gram Logistic Regression classifier, and outputs a timestamped versioned model (`classifier_v_*.joblib`) and training report.
+  5. **Adversarial Red-Team Generator (§8.2):** `eval/redteam.py` generates adversarial mutations (polite indirect framing, roleplay hijacking, syntax concealment) across attack categories, submitting them against the firewall and appending bypasses (`action == "ALLOW"`) to `data/redteam_bypasses.jsonl`.
+- **Status:** Approved.
+
