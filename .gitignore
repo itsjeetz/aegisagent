@@ -34,6 +34,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+node_modules/
 
 # Data outputs & cache
 /data/models/*
@@ -49,6 +50,19 @@ wheels/
 *.sqlite3
 *.db
 
+# Executables & Binaries
+cloudflared.exe
+*.exe
+
+# Logs & temporary files
+*.log
+scratch/
+.system_generated/
+
 # OS
 .DS_Store
 Thumbs.db
+
+# IDE
+.vscode/
+.idea/

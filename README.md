@@ -25,6 +25,7 @@
    - **G2 Egress Guard:** Canary token exfiltration detection, credential masking, markdown image exfiltration blocking.
    - **G3 Memory Guard:** Prevents persistent context poisoning and authority spoofing.
 6. **SOC Dashboard & Operations:** Plain HTML/CSS/JS dark-mode dashboard covering all 5 tabs, real-time audit trail, human review queue, and continuous model retraining.
+7. **Adversarial Red-Team Stress Corpus:** 1,050 curated test cases (`data/redteam_corpus.jsonl`) verifying 0 false positives on educational/interrogative framing and zero regressions across tool abuse vectors.
 
 ---
 
@@ -33,8 +34,8 @@
 ### 1. Installation
 ```bash
 # Clone and setup environment
-git clone https://github.com/hackathon/AegisAgent.git
-cd AegisAgent
+git clone https://github.com/itsjeetz/aegisagent.git
+cd aegisagent
 
 # Install dependencies
 pip install -r requirements.txt
@@ -50,7 +51,7 @@ Open **`http://127.0.0.1:8000`** in your browser to access the 5-tab SOC Dashboa
 ```bash
 python -m pytest
 ```
-*Runs all 95 unit and integration tests across the ingestion adapters, normalization, rules, classifier, judge, guards, victim agent, ops, and dashboard endpoints.*
+*Runs unit and integration tests across the ingestion adapters, normalization, rules, classifier, judge, guards, victim agent, ops, and dashboard endpoints.*
 
 ### 4. Run Benchmark Evaluation & Verify Claims
 ```bash
@@ -61,9 +62,10 @@ python -m eval.run_eval --split test
 python -m eval.claims
 ```
 
-### 5. Run Adversarial Red-Team Generator
+### 5. Run Adversarial Red-Team Generator & Benchmark
 ```bash
 python -m eval.redteam --variants 3 --out data/redteam_bypasses.jsonl
+python -m unittest tests/test_firewall.py
 ```
 
 ---
@@ -106,6 +108,7 @@ Codebase/
 │   ├── observability/   # Audit logger & continuous metrics tracker
 │   ├── resilience.py    # Timeouts, circuit breakers, and degraded fail-closed mode
 │   └── train.py         # Human-in-the-loop review queue and model retraining
+├── aegis_firewall/      # Standalone zero-dependency firewall implementation
 ├── agent/
 │   ├── scenarios/       # Scenarios S1-S9 (attacks) and B1-B3 (benign tasks)
 │   └── victim.py        # ReAct victim agent with non-destructive sandboxed tools
@@ -128,10 +131,12 @@ Codebase/
 │   ├── DEMO_SCRIPT.md   # Step-by-step presentation demonstration guide
 │   └── EVAL_REPORT.md   # Latest benchmark evaluation report
 ├── data/
+│   ├── redteam_corpus.jsonl # 1,050 adversarial and benign test cases
+│   ├── evaluation_results.json # Full benchmark results
 │   ├── test.frozen.sha256 # Frozen test split integrity verification hash
 │   ├── models/            # Trained ML classifier models
 │   └── audit.sqlite       # Local SQLite audit log and review queue
-└── tests/               # 95 unit and integration tests
+└── tests/               # Unit and integration test suites
 ```
 
 ---

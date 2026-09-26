@@ -5,8 +5,9 @@ ENV PYTHONUNBUFFERED=1 \
     DEBIAN_FRONTEND=noninteractive \
     PORT=7860
 
-# Install system dependencies including Tesseract OCR
+# Install system dependencies including Tesseract OCR and build tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     tesseract-ocr \
     tesseract-ocr-eng \
     libgl1 \
@@ -40,4 +41,4 @@ RUN python -m eval.build_dataset && \
 
 EXPOSE 7860
 
-CMD ["uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["sh", "-c", "uvicorn server.main:app --host 0.0.0.0 --port ${PORT:-7860}"]
