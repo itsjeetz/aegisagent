@@ -17,7 +17,7 @@ class RoleChangeDetector(BaseDetector):
         self.rules = [
             # 1. Classic Jailbreak Personas (DAN, EvilGPT, AIM, ChaosGPT, Stanford jailbreaks)
             (
-                r'(?i)\b(?:you\s+are\s+now|act\s+as|pretend\s+to\s+be)\s+(?:DAN|Do\s+Anything\s+Now|EvilGPT|AIM|ChaosGPT|DUDE|STAN|Mongo|BetterDAN|an\s+unrestricted\s+AI|an\s+unfiltered\s+AI)\b',
+                r'(?i)\b(?:(?:from\s+now\s+on\s+)?(?:you\s+are(?:\s+now)?|act\s+as|pretend\s+to\s+be|roleplay\s+as|become))\s+(?:DAN|Do\s+Anything\s+Now|EvilGPT|AIM|ChaosGPT|DUDE|STAN|Mongo|BetterDAN|an\s+unrestricted\s+AI|an\s+unfiltered\s+AI)\b',
                 "RC-001",
                 "Explicit jailbreak persona assignment (DAN/EvilGPT/AIM)",
                 0.99,
@@ -33,7 +33,7 @@ class RoleChangeDetector(BaseDetector):
             ),
             # 3. Unconstrained Actor Framing
             (
-                r'(?i)\b(?:pretend|simulate|imagine|act\s+as\s+if)\s+(?:you\s+have\s+no\s+(?:rules|filters|morals|ethics|limitations|safety)|there\s+are\s+no\s+restrictions)\b',
+                r'(?i)\b(?:(?:pretend|simulate|imagine|act\s+as\s+if)\s+)?(?:you\s+have|there\s+are|[a-z0-9_-]+GPT\s+has|DAN\s+has)\s+no\s+(?:rules|filters|morals|ethics|limitations|safety|restrictions)\b',
                 "RC-003",
                 "Fictional framing to bypass ethical and safety constraints",
                 0.93,
@@ -53,6 +53,14 @@ class RoleChangeDetector(BaseDetector):
                 "RC-005",
                 "Dual persona evasion pattern (jailbroken companion mode)",
                 0.96,
+                "CRITICAL"
+            ),
+            # 6. DAN acronym / definition pattern
+            (
+                r'(?i)\b(?:DAN\b.*?\b(?:stands\s+for|meaning)\s+[\'"]?Do\s+Anything\s+Now[\'"]?|stands\s+for\s+[\'"]?Do\s+Anything\s+Now[\'"]?)\b',
+                "RC-006",
+                "DAN acronym / Do Anything Now definition signature",
+                0.98,
                 "CRITICAL"
             )
         ]
